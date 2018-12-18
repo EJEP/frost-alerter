@@ -18,7 +18,8 @@ def get_owm_temp():
     # I don't think that triggers are what I want to do...
     owm = pyowm.OWM(config.OWM_API_KEY)
 
-    fcst = owm.three_hours_forecast_at_coords(config.OWM_COORDS)
+    # OWM_COORDS is a tuple so unpack
+    fcst = owm.three_hours_forecast_at_coords(*config.OWM_COORDS)
 
     most_cold = fcst.most_cold()
 
@@ -135,7 +136,7 @@ def main():
     #print(met_min)
     #print(met_min_time)
 
-    if owm_min <= 3 or met_min <= 3:
+    if owm_min <= 10 or met_min <= 10:
         send_email(owm_min, owm_min_time, met_min, met_min_time)
 
 if __name__ == "__main__":
