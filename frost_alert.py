@@ -136,7 +136,7 @@ def main():
     #print(met_min)
     #print(met_min_time)
 
-    if owm_min <= 3 or met_min <= 3:
+    if owm_min <= 15 or met_min <= 15:
         send_email(owm_min, owm_min_time, met_min, met_min_time)
 
 if __name__ == "__main__":
