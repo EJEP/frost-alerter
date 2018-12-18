@@ -1,0 +1,26 @@
+"""Skeleton file for configuration. The variables in this file will be
+different for any user, and may be secret"""
+
+# API keys for OWM and Datapoint. Both are expected to be strings
+OWM_API_KEY = 'Your key here'
+DATAPOINT_API_KEY = 'Your key here'
+
+# Variables for the email
+# The url for the mail host, e.g. smtp.gmail.com. Expected to be a string
+MAIL_HOST = 'smtp.gmail.com'
+# The port to contact the host on, e.g. 465. Expected to be a number
+MAIL_PORT = 465
+# The user to connect to the mail host as
+MAIL_USER = 'fake.name@mail.com'
+# The password for the user.
+MAIL_PASSWD = 'password'
+# Email address(es) to send alerts to. Either a string or a list of strings
+MAIL_TO = 'be.alerted@mail.com'
+# Address to use for the from field in the email header. May be ignored by the
+# host
+MAIL_FROM = 'frost_alert@pi'
+
+# Latitude / Longitude decimal coordinates of the location to receive alerts
+# for. Both are tuples. The location shown is for Greenwich Observatory.
+MET_COORDS = (51.4778, -0.0014)
+OWM_COORDS = (51.4778, -0.0014)
