@@ -1,5 +1,5 @@
 """Email me when there will be a frost. This happens if the temperature is less
-than 0 degrees. Not strictly true but good enough."""
+than 3 degrees. Not strictly true but good enough."""
 
 import datetime
 import smtplib
@@ -18,7 +18,7 @@ def get_owm_temp():
     # I don't think that triggers are what I want to do...
     owm = pyowm.OWM(config.OWM_API_KEY)
 
-    fcst = owm.three_hours_forecast(config.OWM_LOC)
+    fcst = owm.three_hours_forecast_at_coords(config.OWM_COORDS)
 
     most_cold = fcst.most_cold()
 
@@ -55,6 +55,7 @@ def get_met_office_temp():
 
     con = datapoint.connection(api_key=config.DATAPOINT_API_KEY)
 
+    # MET_COORDS is a tuple, so unpack it in the argument
     location = con.get_nearest_site(*config.MET_COORDS)
     forecast = con.get_forecast_for_site(location.id, '3hourly')
 
