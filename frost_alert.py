@@ -5,36 +5,23 @@ import datetime
 import smtplib
 from email.message import EmailMessage
 import pyowm
-from pyowm.alertapi30.enums import WeatherParametersEnum, OperatorsEnum, AlertChannelsEnum
-from pyowm.alertapi30.condition import Condition
 import datapoint
 import config
 
 def get_owm_temp():
     """Get the temperature from OWM"""
 
-    # See https://pyowm.readthedocs.io/en/latest/alerts-api-usage-examples.html
-    # for how this works
-    # I don't think that triggers are what I want to do...
     owm = pyowm.OWM(config.OWM_API_KEY)
 
     # OWM_COORDS is a tuple so unpack
     fcst = owm.three_hours_forecast_at_coords(*config.OWM_COORDS)
-
-    most_cold = fcst.most_cold()
-
-    min_temp = most_cold.get_temperature()['temp']
-
-    min_temp_c = min_temp - 273
-
-    #print(min_temp_c)
 
     # Only want to check the weather for 'tonight'
     cast = fcst.get_forecast()
 
     # How much we keep depends on how long we run...
     # Keep 24 hours for now, so 8 forecasts
-    # Put them in a list for slicing...
+    # get_weathers returns a list so slice...
     weathers = cast.get_weathers()[:8]
 
     min_temp_today = weathers[0].get_temperature('celsius')['temp']
@@ -44,11 +31,6 @@ def get_owm_temp():
         if weather_min_temp < min_temp_today:
             min_temp_today = weather_min_temp
             min_temp_weather = weather
-
-    #print(min_temp_today)
-    #print(type(min_temp_weather.get_reference_time('iso')))
-    #print(type(min_temp_weather.get_reference_time('date')))
-    #print(min_temp_weather.get_reference_time('date'))
 
     return min_temp_today, min_temp_weather.get_reference_time('date')
 
@@ -86,7 +68,7 @@ def send_email(owm_min, owm_min_time, met_min, met_min_time):
     s = smtplib.SMTP_SSL(host=config.MAIL_HOST, port=config.MAIL_PORT)
     s.login(config.MAIL_USER, config.MAIL_PASSWD)
 
-    # Build a message. Message depends on temperature?
+    # Build a message. Message depends on the forecasts.
     msg = EmailMessage()
     msg['From'] = config.MAIL_FROM
     msg['to'] = config.MAIL_TO
@@ -96,7 +78,6 @@ def send_email(owm_min, owm_min_time, met_min, met_min_time):
 
     msg.set_content(message_text)
 
-    #print(message_text)
     # Send the message
     s.send_message(msg)
 
@@ -130,11 +111,6 @@ def main():
     # Get the weather forecast from both things
     owm_min, owm_min_time = get_owm_temp()
     met_min, met_min_time = get_met_office_temp()
-
-    #print(owm_min)
-    #print(owm_min_time)
-    #print(met_min)
-    #print(met_min_time)
 
     if owm_min <= 3 or met_min <= 3:
         send_email(owm_min, owm_min_time, met_min, met_min_time)
