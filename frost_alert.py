@@ -83,7 +83,7 @@ def send_email(owm_min, owm_min_time, met_min, met_min_time):
     """Send an email to me, telling me if there will be a frost"""
 
     # Set up a connection to gmail or somewhere
-    s = smtplib.SMTP_SSL(host='smtp.gmail.com', port=465)
+    s = smtplib.SMTP_SSL(host=config.MAIL_HOST, port=config.MAIL_PORT)
     s.login(config.MAIL_USER, config.MAIL_PASSWD)
 
     # Build a message. Message depends on temperature?
@@ -136,7 +136,7 @@ def main():
     #print(met_min)
     #print(met_min_time)
 
-    if owm_min <= 10 or met_min <= 10:
+    if owm_min <= 3 or met_min <= 3:
         send_email(owm_min, owm_min_time, met_min, met_min_time)
 
 if __name__ == "__main__":
