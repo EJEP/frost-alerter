@@ -57,7 +57,7 @@ def get_met_office_temp():
     con = datapoint.connection(api_key=config.DATAPOINT_API_KEY)
 
     # MET_COORDS is a tuple, so unpack it in the argument
-    location = con.get_nearest_site(*config.MET_COORDS)
+    location = con.get_nearest_forecast_site(*config.MET_COORDS)
     forecast = con.get_forecast_for_site(location.id, '3hourly')
 
     # Only get the next 24 hours of forecasts
