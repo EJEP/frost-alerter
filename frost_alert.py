@@ -25,6 +25,7 @@ def get_owm_temp():
     weathers = cast.get_weathers()[:8]
 
     min_temp_today = weathers[0].get_temperature('celsius')['temp']
+    min_temp_weather = weathers[0]
 
     for weather in weathers:
         weather_min_temp = weather.get_temperature('celsius')['temp']
