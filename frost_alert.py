@@ -8,6 +8,7 @@ import pyowm
 import datapoint
 import config
 
+
 def get_owm_temp():
     """Get the temperature from OWM"""
 
@@ -34,6 +35,7 @@ def get_owm_temp():
             min_temp_weather = weather
 
     return min_temp_today, min_temp_weather.get_reference_time('date')
+
 
 def get_met_office_temp():
 
@@ -62,6 +64,7 @@ def get_met_office_temp():
 
     return min_temp, min_temp_time
 
+
 def send_email(owm_min, owm_min_time, met_min, met_min_time):
     """Send an email to me, telling me if there will be a frost"""
 
@@ -81,6 +84,7 @@ def send_email(owm_min, owm_min_time, met_min, met_min_time):
 
     # Send the message
     s.send_message(msg)
+
 
 def build_message(owm_min, owm_min_time, met_min, met_min_time):
     """Assemble the text to send as a message"""
@@ -107,6 +111,7 @@ The Met Office predicts a minimum of {}C at {}.
 
     return message
 
+
 def main():
 
     # Get the weather forecast from both things
@@ -116,8 +121,6 @@ def main():
     if owm_min <= 3 or met_min <= 3:
         send_email(owm_min, owm_min_time, met_min, met_min_time)
 
+
 if __name__ == "__main__":
     main()
-
-
-
