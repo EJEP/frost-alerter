@@ -4,7 +4,7 @@ A python script to send an email if frost is expected in the next 24 hours at a 
 
 ## Requirements ##
 
-This program requires API keys for the [OpenWeatherMap API](https://openweathermap.org/api) and the MetOffice [Datapoint API](https://www.metoffice.gov.uk/datapoint). These are accessed in python using the [pyowm](https://github.com/csparpa/pyowm) and [datapoint-python](https://github.com/jacobtomlinson/datapoint-python) modules.
+This program requires API keys for the [OpenWeatherMap API](https://openweathermap.org/api) and the MetOffice [Datapoint API](https://www.metoffice.gov.uk/datapoint). These are accessed in python using the [pyowm](https://github.com/csparpa/pyowm) and [datapoint](https://github.com/ejep/datapoint-python) modules.
 
 The email is sent using `smtplib` and `email`, both part of the python standard library.
 
