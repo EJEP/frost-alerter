@@ -21,6 +21,6 @@ MAIL_TO = 'be.alerted@mail.com'
 MAIL_FROM = 'frost_alert@pi'
 
 # Latitude / Longitude decimal coordinates of the location to receive alerts
-# for. Both are tuples. The location shown is for Greenwich Observatory.
-MET_COORDS = (51.4778, -0.0014)
-OWM_COORDS = (51.4778, -0.0014)
+# for. The location shown is for Greenwich Observatory.
+LATITUDE = 51.4778
+LONGITUDE = -0.0014

@@ -4,7 +4,7 @@ than 3 degrees. Not strictly true but good enough."""
 import datetime
 import smtplib
 from email.message import EmailMessage
-import pyowm
+from pyowm.owm import OWM
 import datapoint
 import config
 
@@ -12,29 +12,23 @@ import config
 def get_owm_temp():
     """Get the temperature from OWM"""
 
-    owm = pyowm.OWM(config.OWM_API_KEY)
+    owm = OWM(config.OWM_API_KEY)
 
-    # OWM_COORDS is a tuple so unpack
-    fcst = owm.three_hours_forecast_at_coords(*config.OWM_COORDS)
+    mgr = owm.weather_manager()
 
-    # Only want to check the weather for 'tonight'
-    cast = fcst.get_forecast()
+    one_call = mgr.one_call(lat=config.LATITUDE, lon=config.LONGITUDE)
 
-    # How much we keep depends on how long we run...
-    # Keep 24 hours for now, so 8 forecasts
-    # get_weathers returns a list so slice...
-    weathers = cast.get_weathers()[:8]
+    forecasts = one_call.forecast_hourly[:24]
 
-    min_temp_today = weathers[0].get_temperature('celsius')['temp']
-    min_temp_weather = weathers[0]
+    min_temp = forecasts[0].temperature('celsius')['temp']
+    min_temp_time = forecasts[0].reference_time('date')
+    for forecast in forecasts:
+        fc_temp = forecast.temperature('celsius')['temp']
+        if fc_temp < min_temp:
+            min_temp = fc_temp
+            min_temp_time = forecasts[0].reference_time('date')
 
-    for weather in weathers:
-        weather_min_temp = weather.get_temperature('celsius')['temp']
-        if weather_min_temp < min_temp_today:
-            min_temp_today = weather_min_temp
-            min_temp_weather = weather
-
-    return min_temp_today, min_temp_weather.get_reference_time('date')
+    return min_temp, min_temp_time
 
 
 def get_met_office_temp():
@@ -42,7 +36,7 @@ def get_met_office_temp():
     con = datapoint.connection(api_key=config.DATAPOINT_API_KEY)
 
     # MET_COORDS is a tuple, so unpack it in the argument
-    location = con.get_nearest_forecast_site(*config.MET_COORDS)
+    location = con.get_nearest_forecast_site(config.LATITUDE, config.LONGITUDE)
     forecast = con.get_forecast_for_site(location.id, '3hourly')
 
     # Only get the next 24 hours of forecasts
