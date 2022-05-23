@@ -4,6 +4,7 @@ than 3 degrees. Not strictly true but good enough."""
 import logging
 import datetime
 import smtplib
+import os
 from email.message import EmailMessage
 from pyowm.owm import OWM
 import datapoint
@@ -11,18 +12,23 @@ import config
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
-logger.setLevel(level=config.LOG_LEVEL)
+if 'FROST_ALERT_LOG_LEVEL' in os.environ.keys():
+    logger.setLevel(level=os.environ['FROST_ALERT_LOG_LEVEL'])
+else:
+    try:
+        config.LOG_LEVEL
+    except AttributeError:
+        pass
+    else:
+        logger.setLevel(level=config.LOG_LEVEL)
 
 
 def get_owm_temp():
     """Get the temperature from OWM"""
 
     owm = OWM(config.OWM_API_KEY)
-
     mgr = owm.weather_manager()
-
     one_call = mgr.one_call(lat=config.LATITUDE, lon=config.LONGITUDE)
-
     forecasts = one_call.forecast_hourly[:24]
 
     min_temp = forecasts[0].temperature("celsius")["temp"]
