@@ -24,3 +24,6 @@ MAIL_FROM = 'frost_alert@pi'
 # for. The location shown is for Greenwich Observatory.
 LATITUDE = 51.4778
 LONGITUDE = -0.0014
+
+# Allow for setting log level, can be set by an environment variable
+LOG_LEVEL = "WARNING"
