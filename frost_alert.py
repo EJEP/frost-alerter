@@ -1,12 +1,17 @@
 """Email me when there will be a frost. This happens if the temperature is less
 than 3 degrees. Not strictly true but good enough."""
 
+import logging
 import datetime
 import smtplib
 from email.message import EmailMessage
 from pyowm.owm import OWM
 import datapoint
 import config
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(level=config.LOG_LEVEL)
 
 
 def get_owm_temp():
@@ -24,10 +29,13 @@ def get_owm_temp():
     min_temp_time = forecasts[0].reference_time("date")
     for forecast in forecasts:
         fc_temp = forecast.temperature("celsius")["temp"]
+        fc_time = forecasts[0].reference_time("date")
+        logger.debug(f"Time: {fc_time}; Temp: {fc_temp}C")
         if fc_temp < min_temp:
             min_temp = fc_temp
-            min_temp_time = forecasts[0].reference_time("date")
+            min_temp_time = fc_time
 
+    logger.info(f"Minimum temperature from OWM is {min_temp}C at {min_temp_time}")
     return min_temp, min_temp_time
 
 
@@ -52,10 +60,14 @@ def get_met_office_temp():
     for day in forecast.days:
         for timestep in day.timesteps:
             if timestep.date < tomorrow and timestep.date > now:
+                temp = timestep.temperature.value
+                time = timestep.date
+                logger.debug(f"Time: {time}; Temp: {temp}C")
                 if timestep.temperature.value < min_temp:
-                    min_temp = timestep.temperature.value
-                    min_temp_time = timestep.date
+                    min_temp = temp
+                    min_temp_time = time
 
+    logger.info(f"Minimum temperature from Met Office is {min_temp}C at {min_temp_time}")
     return min_temp, min_temp_time
 
 
@@ -63,8 +75,8 @@ def send_email(owm_min, owm_min_time, met_min, met_min_time):
     """Send an email to me, telling me if there will be a frost"""
 
     # Set up a connection to gmail or somewhere
-    s = smtplib.SMTP_SSL(host=config.MAIL_HOST, port=config.MAIL_PORT)
-    s.login(config.MAIL_USER, config.MAIL_PASSWD)
+    smtp_con = smtplib.SMTP_SSL(host=config.MAIL_HOST, port=config.MAIL_PORT)
+    smtp_con.login(config.MAIL_USER, config.MAIL_PASSWD)
 
     # Build a message. Message depends on the forecasts.
     msg = EmailMessage()
@@ -77,7 +89,7 @@ def send_email(owm_min, owm_min_time, met_min, met_min_time):
     msg.set_content(message_text)
 
     # Send the message
-    s.send_message(msg)
+    smtp_con.send_message(msg)
 
 
 def build_message(owm_min, owm_min_time, met_min, met_min_time):
@@ -95,6 +107,7 @@ def build_message(owm_min, owm_min_time, met_min, met_min_time):
     else:
         predicted_by = "nobody"
 
+    logger.info(f"Frost predicted by {predicted_by}")
     message = """\
 Alert! Frost is predicted by {} tonight!
 
