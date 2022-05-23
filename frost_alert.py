@@ -20,13 +20,13 @@ def get_owm_temp():
 
     forecasts = one_call.forecast_hourly[:24]
 
-    min_temp = forecasts[0].temperature('celsius')['temp']
-    min_temp_time = forecasts[0].reference_time('date')
+    min_temp = forecasts[0].temperature("celsius")["temp"]
+    min_temp_time = forecasts[0].reference_time("date")
     for forecast in forecasts:
-        fc_temp = forecast.temperature('celsius')['temp']
+        fc_temp = forecast.temperature("celsius")["temp"]
         if fc_temp < min_temp:
             min_temp = fc_temp
-            min_temp_time = forecasts[0].reference_time('date')
+            min_temp_time = forecasts[0].reference_time("date")
 
     return min_temp, min_temp_time
 
@@ -37,7 +37,7 @@ def get_met_office_temp():
 
     # MET_COORDS is a tuple, so unpack it in the argument
     location = con.get_nearest_forecast_site(config.LATITUDE, config.LONGITUDE)
-    forecast = con.get_forecast_for_site(location.id, '3hourly')
+    forecast = con.get_forecast_for_site(location.id, "3hourly")
 
     # Only get the next 24 hours of forecasts
     # A check of each timestamp against an end date seems easiest given the
@@ -68,9 +68,9 @@ def send_email(owm_min, owm_min_time, met_min, met_min_time):
 
     # Build a message. Message depends on the forecasts.
     msg = EmailMessage()
-    msg['From'] = config.MAIL_FROM
-    msg['to'] = config.MAIL_TO
-    msg['Subject'] = 'Frost alert!'
+    msg["From"] = config.MAIL_FROM
+    msg["to"] = config.MAIL_TO
+    msg["Subject"] = "Frost alert!"
 
     message_text = build_message(owm_min, owm_min_time, met_min, met_min_time)
 
@@ -83,17 +83,17 @@ def send_email(owm_min, owm_min_time, met_min, met_min_time):
 def build_message(owm_min, owm_min_time, met_min, met_min_time):
     """Assemble the text to send as a message"""
 
-    owm_time = owm_min_time.strftime('%H:%M on %Y-%m-%d')
-    met_time = met_min_time.strftime('%H:%M on %Y-%m-%d')
+    owm_time = owm_min_time.strftime("%H:%M on %Y-%m-%d")
+    met_time = met_min_time.strftime("%H:%M on %Y-%m-%d")
 
     if owm_min <= 3 and met_min <= 3:
-        predicted_by = 'OWM and the Met Office'
+        predicted_by = "OWM and the Met Office"
     elif owm_min <= 3 and met_min > 3:
-        predicted_by = 'OWM'
+        predicted_by = "OWM"
     elif owm_min > 3 and met_min <= 3:
-        predicted_by = 'the Met Office'
+        predicted_by = "the Met Office"
     else:
-        predicted_by = 'nobody'
+        predicted_by = "nobody"
 
     message = """\
 Alert! Frost is predicted by {} tonight!
@@ -101,7 +101,9 @@ Alert! Frost is predicted by {} tonight!
 OpenWeatherMap predicts a minimum of {}C at {}.
 The Met Office predicts a minimum of {}C at {}.
 
-    """.format(predicted_by, owm_min, owm_time, met_min, met_time)
+    """.format(
+        predicted_by, owm_min, owm_time, met_min, met_time
+    )
 
     return message
 
