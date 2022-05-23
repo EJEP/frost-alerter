@@ -35,7 +35,7 @@ def get_owm_temp():
     min_temp_time = forecasts[0].reference_time("date")
     for forecast in forecasts:
         fc_temp = forecast.temperature("celsius")["temp"]
-        fc_time = forecasts[0].reference_time("date")
+        fc_time = forecast.reference_time("date")
         logger.debug(f"Time: {fc_time}; Temp: {fc_temp}C")
         if fc_temp < min_temp:
             min_temp = fc_temp
